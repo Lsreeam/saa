@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>
+        <meta charset="UTF-8">
+        <title>Online-register</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <header class="header-1">
+            <p class="title">Онлайн щоденник</p>
+        </header>
+        <main>
+        <div class="header-2">
+            <p class="menu title-2">Розклад занять</p>
+            <a href='#' class="menu title-3">Home</a>
+            <a href="contacts.html" class="menu title-3">Contact</a>
+
+            <button class="theme-btn title-3" id="themeToggle">🌙</button>
+
+        </div>
+        
+        <div class="days main">
+            <h3>Виберіть День</h3>
+            <div class="days-container">
+                <button class="day-btn active" data-day="Понеділок">Пн</button>
+                <button class="day-btn" data-day="Вівторок">Вт</button>
+                <button class="day-btn" data-day="Середа">Ср</button>
+                <button class="day-btn" data-day="Четвер">Чт</button>
+                <button class="day-btn" data-day="П'ятниця">Пт</button>
+            </div>
+        </div>
+
+        <div class="workplace main">
+            <div class="main-container">
+                <div class="add-lesson-container">
+                    <p class="text">Додати урок</p>
+                    <input type="text" class="name" value="Додати урок">
+                    <button class="add-lesson-btn">Додати</button>
+                </div>
+                <div class="add-homework-container">
+                    <p class="text">Додайте урок</p>
+                    <select class="choose-lesson">
+                        <option value="example" selected>Виберіть предмет</option>
+                    </select>
+                    <input type="text" class="name" value="Додати домашку">
+                    <button class="add-homework-btn">Додати</button>
+                </div>
+            </div>
+            
+            <div class="schedules-wrapper">
+                <div class="dynamic-schedule-box">
+                    <h3>Розклад:</h3>
+                    <div id="dynamic-list"></div>
+                </div>
+
+                <div class="static-schedule-box">
+                    <div class="container">
+                        <h1>ВАШ РОЗКЛАД</h1>
+                        <div id="static-schedule-list">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </main>
+        <script src="script.js"></script>
+    </body>
+</html>
