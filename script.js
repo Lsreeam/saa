@@ -24,16 +24,21 @@ function getCookie(name) {
 let currentDay = 'Понеділок'; 
 let lessons = [];
 let homework = [];
+let pendingAction = null;
 
 const addLessonBtn = document.querySelector('.add-lesson-btn');
 const addHomeworkBtn = document.querySelector('.add-homework-btn');
 const lessonInput = document.querySelector('.add-lesson-container .name');
 const chooseLesson = document.querySelector('.choose-lesson');
 const homeworkInput = document.querySelector('.add-homework-container .name');
-const dynamicListDiv = document.getElementById('dynamic-list');
 const staticScheduleList = document.getElementById('static-schedule-list');
 const toggleSwitch = document.querySelector('#myToggle');
 const dayButtons = document.querySelectorAll('.day-btn');
+const clearDayBtn = document.getElementById('clearDayBtn');
+const confirmModal = document.getElementById('confirm-modal');
+const confirmMessage = document.getElementById('confirm-message');
+const confirmYes = document.getElementById('confirmYes');
+const confirmNo = document.getElementById('confirmNo');
 
 function loadDataForDay(day) {
     lessons = getCookie('lessons_' + day) || [];
@@ -43,7 +48,6 @@ function loadDataForDay(day) {
 function initDay() {
     loadDataForDay(currentDay);
     updateLessonSelect();
-    display();
     renderSchedule();
 }
 
@@ -69,21 +73,32 @@ dayButtons.forEach(btn => {
     });
 });
 
-function setupInputPlaceholder(inputElement, placeholderText) {
-    inputElement.addEventListener('focus', () => {
-        if (inputElement.value === placeholderText) {
-            inputElement.value = '';
-        }
-    });
-    inputElement.addEventListener('blur', () => {
-        if (inputElement.value.trim() === '') {
-            inputElement.value = placeholderText;
+if (addLessonBtn) {
+    addLessonBtn.addEventListener('click', () => {
+        const lessonName = lessonInput.value.trim();
+        if (lessonName) {
+            lessons.push(lessonName);
+            setCookie('lessons_' + currentDay, lessons, 365);
+            updateLessonSelect();
+            lessonInput.value = '';
+            renderSchedule();
         }
     });
 }
 
-setupInputPlaceholder(lessonInput, 'Додати урок');
-setupInputPlaceholder(homeworkInput, 'Додати домашку');
+if (addHomeworkBtn) {
+    addHomeworkBtn.addEventListener('click', () => {
+        const selectedLesson = chooseLesson.value;
+        const homeworkText = homeworkInput.value.trim();
+        
+        if (selectedLesson !== 'example' && homeworkText) {
+            homework.push({ lesson: selectedLesson, task: homeworkText });
+            setCookie('homework_' + currentDay, homework, 365);
+            homeworkInput.value = '';
+            renderSchedule();
+        }
+    });
+}
 
 function updateLessonSelect() {
     while (chooseLesson.options.length > 1) {
@@ -97,164 +112,212 @@ function updateLessonSelect() {
     });
 }
 
-if (addLessonBtn) {
-    addLessonBtn.addEventListener('click', () => {
-        const lessonName = lessonInput.value.trim();
-        if (lessonName && lessonName !== 'Додати урок') {
-            lessons.push(lessonName);
-            setCookie('lessons_' + currentDay, lessons, 365);
-            
-            updateLessonSelect();
-            lessonInput.value = 'Додати урок';
-            display();
-        }
-    });
-}
-
-if (addHomeworkBtn) {
-    addHomeworkBtn.addEventListener('click', () => {
-        const selectedLesson = chooseLesson.value;
-        const homeworkText = homeworkInput.value.trim();
-        
-        if (selectedLesson !== 'example' && homeworkText && homeworkText !== 'Додати домашку') {
-            homework.push({ lesson: selectedLesson, task: homeworkText });
-            setCookie('homework_' + currentDay, homework, 365);
-            homeworkInput.value = 'Додати домашку';
-            display();
-        }
-    });
-}
-
 function loadTaskState(day, taskId) {
-    const state = JSON.parse(localStorage.getItem('schedule_' + day) || '{}');
+    const state = getCookie('task_state_' + day) || {};
     return state[taskId] === true;
 }
 
 function saveTaskState(day, taskId, isChecked) {
-    const state = JSON.parse(localStorage.getItem('schedule_' + day) || '{}');
+    const state = getCookie('task_state_' + day) || {};
     state[taskId] = isChecked;
-    localStorage.setItem('schedule_' + day, JSON.stringify(state));
+    setCookie('task_state_' + day, state, 365);
 }
 
-function display() {
-    dynamicListDiv.innerHTML = ''; 
-    
-    if (lessons.length > 0) {
-        const lessonsTitle = document.createElement('h4');
-        lessonsTitle.textContent = 'Уроки:';
-        dynamicListDiv.appendChild(lessonsTitle);
-        
-        lessons.forEach((lesson, index) => {
-            const p = document.createElement('p');
-            p.textContent = `${index + 1}. ${lesson}`;
-            p.addEventListener('click', () => {
-                const lessonName = lessons[index];
-                homework = homework.filter(h => h.lesson !== lessonName);
-                setCookie('homework_' + currentDay, homework, 365);
-                
-                lessons.splice(index, 1);
-                setCookie('lessons_' + currentDay, lessons, 365);
-                updateLessonSelect();
-                display();
-            });
-            dynamicListDiv.appendChild(p);
-        });
+function deleteLesson(index) {
+    const lessonName = lessons[index];
+    homework = homework.filter(hw => hw.lesson !== lessonName);
+    lessons.splice(index, 1);
+    setCookie('lessons_' + currentDay, lessons, 365);
+    setCookie('homework_' + currentDay, homework, 365);
+    updateLessonSelect();
+    renderSchedule();
+}
+
+function deleteHomework(index) {
+    homework.splice(index, 1);
+    setCookie('homework_' + currentDay, homework, 365);
+    renderSchedule();
+}
+
+function showConfirmModal(message, action) {
+    confirmMessage.textContent = message;
+    pendingAction = action;
+    confirmModal.style.display = 'flex';
+}
+
+function hideConfirmModal() {
+    confirmModal.style.display = 'none';
+    pendingAction = null;
+}
+
+confirmYes.addEventListener('click', () => {
+    if (pendingAction) {
+        pendingAction();
     }
-    
-    if (homework.length > 0) {
-        const hwTitle = document.createElement('h4');
-        hwTitle.textContent = 'Домашка:';
-        hwTitle.style.marginTop = '15px';
-        dynamicListDiv.appendChild(hwTitle);
+    hideConfirmModal();
+});
 
-        const lessonTaskCounters = {};
-        
-        homework.forEach((hw, index) => {
-            const lessonIndex = lessons.indexOf(hw.lesson);
-            
-            if (lessonIndex !== -1) {
-                const isCompleted = loadTaskState(currentDay, `task-${lessonIndex + 1}`);
-                if (isCompleted) return;
-            }
+confirmNo.addEventListener('click', hideConfirmModal);
 
-            if (!lessonTaskCounters[hw.lesson]) {
-                lessonTaskCounters[hw.lesson] = 0;
-            }
-            lessonTaskCounters[hw.lesson]++;
-            
-            const lessonNumber = lessonIndex + 1;
-            const taskCounter = lessonTaskCounters[hw.lesson];
-            const displayIndex = `${lessonNumber}.${taskCounter}`;
-
-            const p = document.createElement('p');
-            p.textContent = `${displayIndex} (${hw.lesson}): ${hw.task}`;
-            p.addEventListener('click', () => {
-                homework.splice(index, 1);
-                setCookie('homework_' + currentDay, homework, 365);
-                display();
-            });
-            dynamicListDiv.appendChild(p);
-        });
+confirmModal.addEventListener('click', function(e) {
+    if (e.target === confirmModal) {
+        hideConfirmModal();
     }
-}
+});
 
-const numTasks = 8;
-const tasks = [];
-for (let i = 1; i <= numTasks; i++) {
-    tasks.push({ id: `task-${i}`, name: `Урок ${i} - Домашнє завдання` });
-}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && confirmModal.style.display === 'flex') {
+        hideConfirmModal();
+    }
+});
+
+clearDayBtn.addEventListener('click', () => {
+    showConfirmModal('Видалити все на цей день?', () => {
+        lessons = [];
+        homework = [];
+        setCookie('lessons_' + currentDay, [], 365);
+        setCookie('homework_' + currentDay, [], 365);
+        setCookie('task_state_' + currentDay, {}, 365);
+        updateLessonSelect();
+        renderSchedule();
+    });
+});
 
 function renderSchedule() {
     staticScheduleList.innerHTML = '';
     
-    tasks.forEach(task => {
-        const isChecked = loadTaskState(currentDay, task.id);
+    if (lessons.length === 0 && homework.length === 0) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.textContent = 'Додайте уроки';
+        emptyMessage.style.textAlign = 'center';
+        emptyMessage.style.color = '#999';
+        emptyMessage.style.padding = '20px';
+        staticScheduleList.appendChild(emptyMessage);
+        return;
+    }
+    
+    lessons.forEach((lesson, lessonIndex) => {
+        const lessonTasks = homework.filter(hw => hw.lesson === lesson);
+        
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('task-item');
+        
+        const taskId = `homework-${lessonIndex}`;
+        const isChecked = loadTaskState(currentDay, taskId);
+        
         if (isChecked) {
             itemDiv.classList.add('completed');
         }
 
-        itemDiv.innerHTML = `
-            <span class="task-name">${task.name}</span>
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="${task.id}" class="task-checkbox" ${isChecked ? 'checked' : ''}>
-                <label for="${task.id}" class="star-label">★</label>
-            </div>
-        `;
-        staticScheduleList.appendChild(itemDiv);
-    });
+        let taskText = `${lessonIndex + 1}. ${lesson}`;
+        if (lessonTasks.length > 0) {
+            taskText += ` (${lessonTasks.length})`;
+        }
 
-    document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+        const taskName = document.createElement('span');
+        taskName.className = 'task-name';
+        taskName.textContent = taskText;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = taskId;
+        checkbox.className = 'task-checkbox';
+        checkbox.checked = isChecked;
+
+        const label = document.createElement('label');
+        label.htmlFor = taskId;
+        label.className = 'star-label';
+        label.textContent = '★';
+
+        const checkboxWrapper = document.createElement('div');
+        checkboxWrapper.className = 'checkbox-wrapper';
+        checkboxWrapper.appendChild(checkbox);
+        checkboxWrapper.appendChild(label);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '✕';
+        deleteBtn.addEventListener('click', () => {
+            showConfirmModal('Видалити цей урок?', () => {
+                deleteLesson(lessonIndex);
+            });
+        });
+
+        const taskActions = document.createElement('div');
+        taskActions.className = 'task-actions';
+        taskActions.appendChild(checkboxWrapper);
+        taskActions.appendChild(deleteBtn);
+
+        itemDiv.appendChild(taskName);
+        itemDiv.appendChild(taskActions);
+        staticScheduleList.appendChild(itemDiv);
+
         checkbox.addEventListener('change', (e) => {
-            const taskId = e.target.id;
-            const isChecked = e.target.checked;
-            saveTaskState(currentDay, taskId, isChecked);
-            
-            const taskItem = e.target.closest('.task-item');
-            if (taskItem) {
-                if (isChecked) {
-                    taskItem.classList.add('completed');
-                } else {
-                    taskItem.classList.remove('completed');
-                }
+            saveTaskState(currentDay, taskId, e.target.checked);
+            if (e.target.checked) {
+                itemDiv.classList.add('completed');
+            } else {
+                itemDiv.classList.remove('completed');
             }
-            display();
+        });
+
+        lessonTasks.forEach((hw, hwIndex) => {
+            const hwItemDiv = document.createElement('div');
+            hwItemDiv.classList.add('task-item', 'homework-item');
+
+            const hwText = document.createElement('span');
+            hwText.className = 'task-name';
+            hwText.textContent = `└─ ${hwIndex + 1}. ${hw.task}`;
+
+            const hwDeleteBtn = document.createElement('button');
+            hwDeleteBtn.className = 'delete-btn homework-delete-btn';
+            hwDeleteBtn.textContent = '✕';
+            hwDeleteBtn.addEventListener('click', () => {
+                showConfirmModal('Видалити це домашнє завдання?', () => {
+                    deleteHomework(homework.indexOf(hw));
+                });
+            });
+
+            const hwTaskActions = document.createElement('div');
+            hwTaskActions.className = 'task-actions';
+            hwTaskActions.appendChild(hwDeleteBtn);
+
+            hwItemDiv.appendChild(hwText);
+            hwItemDiv.appendChild(hwTaskActions);
+            staticScheduleList.appendChild(hwItemDiv);
         });
     });
 }
 
 initDay();
 
-function closeModal() {
-let modal = document.getElementById('contactModal');
-let overlay = document.getElementById('modalOverlay'); 
-    
-if (modal) {
-    modal.style.display = 'none';
+const contactsLink = document.getElementById('contacts-link');
+const contactsModal = document.getElementById('contacts-modal');
+const closeContactsBtn = document.getElementById('close-contacts');
+
+if (contactsLink && contactsModal) {
+    contactsLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        contactsModal.style.display = 'flex';
+    });
 }
-if (overlay) {
-    overlay.style.display = 'none';
+
+if (closeContactsBtn && contactsModal) {
+    closeContactsBtn.addEventListener('click', function() {
+        contactsModal.style.display = 'none';
+    });
 }
-window.location.href = 'index.html';
+
+if (contactsModal) {
+    contactsModal.addEventListener('click', function(e) {
+        if (e.target === contactsModal) {
+            contactsModal.style.display = 'none';
+        }
+    });
 }
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && contactsModal && contactsModal.style.display === 'flex') {
+        contactsModal.style.display = 'none';
+    }
+});

@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Online-register</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
@@ -13,9 +14,12 @@
         <div class="header-2">
             <p class="menu title-2">Розклад занять</p>
             <a href='#' class="menu title-3">Home</a>
-            <a href="contacts.html" class="menu title-3">Contact</a>
+            <a href="#" class="menu title-3" id="contacts-link">Contact</a>
 
-            <button class="theme-btn title-3" id="themeToggle">🌙</button>
+            <label class="switch menu title-3">
+                <input type="checkbox" class="toggle" id="myToggle">
+                <span class="slider"></span>
+            </label>
 
         </div>
         
@@ -34,35 +38,79 @@
             <div class="main-container">
                 <div class="add-lesson-container">
                     <p class="text">Додати урок</p>
-                    <input type="text" class="name" value="Додати урок">
+                    <input type="text" class="name" placeholder="Додати урок">
                     <button class="add-lesson-btn">Додати</button>
                 </div>
                 <div class="add-homework-container">
-                    <p class="text">Додайте урок</p>
+                    <p class="text">Додайте домашку</p>
                     <select class="choose-lesson">
                         <option value="example" selected>Виберіть предмет</option>
                     </select>
-                    <input type="text" class="name" value="Додати домашку">
+                    <input type="text" class="name" placeholder="Додати домашку">
                     <button class="add-homework-btn">Додати</button>
                 </div>
             </div>
             
             <div class="schedules-wrapper">
-                <div class="dynamic-schedule-box">
-                    <h3>Розклад:</h3>
-                    <div id="dynamic-list"></div>
-                </div>
-
                 <div class="static-schedule-box">
                     <div class="container">
                         <h1>ВАШ РОЗКЛАД</h1>
-                        <div id="static-schedule-list">
+                        <div id="static-schedule-list"></div>
+                        <div class="schedule-actions">
+                            <button class="clear-day-btn" id="clearDayBtn">Очистити день</button>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
+
+        <!-- Contacts Modal -->
+        <div class="modal-overlay" id="contacts-modal" style="display: none;">
+            <div class="contact-modal">
+                <header class="modal-header">
+                    <h2 class="contact-title">Наші контакти</h2>
+                    <span class="close-button" id="close-contacts">&times;</span>
+                </header>
+                <div class="modal-content">
+                    <a href="https:" class="link-for-social">
+                        <div class="social-link">
+                            <i class="fab fa-instagram social-icon"></i>
+                            <span class="social-name">@exemple</span>
+                        </div>
+                    </a>
+                    <a href="https:" class="link-for-social">
+                        <div class="social-link">
+                            <i class="fab fa-telegram-plane social-icon"></i>
+                            <span class="social-name">@exemple</span>
+                        </div>
+                    </a>
+                    <a href="https:" class="link-for-social">
+                        <div class="social-link">
+                            <i class="fab fa-facebook social-icon"></i>
+                            <span class="social-name">@exemple</span>
+                        </div>
+                    </a>
+                    <a href="tel:+380973020069" class="link-for-social">
+                        <div class="social-link">
+                            <i class="fas fa-phone social-icon"></i>
+                            <span class="social-name">Тел.: 098 XXX XX XX</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm Modal -->
+        <div class="modal-overlay" id="confirm-modal" style="display: none;">
+            <div class="confirm-modal">
+                <p id="confirm-message">Ви впевнені?</p>
+                <div class="confirm-buttons">
+                    <button class="confirm-btn" id="confirmYes">Так</button>
+                    <button class="cancel-btn" id="confirmNo">Ні</button>
+                </div>
+            </div>
+        </div>
+
         </main>
         <script src="script.js"></script>
     </body>

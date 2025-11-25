@@ -121,24 +121,17 @@ body.dark-mode .day-btn.active {
     font-size: 1em;
 }
 
-.theme-btn {
-    background: none;
-    border: none;
-    color: white;
-    padding: 0;
-    cursor: pointer;
-    font-size: 1.2em;
-    transition: transform 0.3s ease;
+.switch {
+    position: relative;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+    gap: 30px;
+    width: 50px;
+    height: 20px;
 }
-
-.theme-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
+  
 .toggle {
     opacity: 0;
     width: 0;
@@ -219,17 +212,6 @@ body{
     overflow-x: auto;
 }
 
-.dynamic-schedule-box {
-    flex: 1;
-    min-width: 250px;
-    background-color: #e6e6e6;
-    border-radius: 12px;
-    padding: 15px;
-    overflow-y: auto;
-    height: 100%;
-    box-sizing: border-box;
-}
-
 .static-schedule-box {
     flex: 1;
     min-width: 250px;
@@ -244,6 +226,8 @@ body{
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
     min-height: 100%;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 .add-lesson-container,
@@ -380,6 +364,160 @@ h1 {
     border-bottom: none;
 }
 
+.task-item.homework-item {
+    padding-left: 30px;
+    background-color: rgba(0,0,0,0.03);
+    font-size: 0.85em;
+}
+
+body.dark-mode .task-item.homework-item {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.task-actions {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.delete-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+
+.delete-btn:hover {
+    background-color: #ff5252;
+}
+
+body.dark-mode .delete-btn {
+    background-color: #ff6b6b;
+}
+
+body.dark-mode .delete-btn:hover {
+    background-color: #ff5252;
+}
+
+.homework-delete-btn {
+    background-color: #ff9999;
+    font-size: 12px;
+    padding: 3px 6px;
+}
+
+.homework-delete-btn:hover {
+    background-color: #ff7777;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid #d0d0d0;
+}
+
+body.dark-mode .schedule-actions {
+    border-top-color: #555;
+}
+
+.clear-day-btn {
+    flex: 1;
+    padding: 10px;
+    background-color: #ffa500;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.clear-day-btn:hover {
+    background-color: #ff8c00;
+}
+
+body.dark-mode .clear-day-btn {
+    background-color: #ffa500;
+}
+
+body.dark-mode .clear-day-btn:hover {
+    background-color: #ff8c00;
+}
+
+.confirm-modal {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 300px;
+    border: 2px solid #4E87A3;
+}
+
+body.dark-mode .confirm-modal {
+    background-color: #2d2d2d;
+    border-color: #143c78;
+    color: #e0e0e0;
+}
+
+#confirm-message {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: 500;
+}
+
+body.dark-mode #confirm-message {
+    color: #e0e0e0;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.confirm-btn,
+.cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+    min-width: 80px;
+}
+
+.confirm-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #da190b;
+    transform: translateY(-2px);
+}
+
 body.dark-mode .task-item {
     color: #e0e0e0;
     border-bottom: 1px solid #555;
@@ -387,9 +525,9 @@ body.dark-mode .task-item {
 
 .task-name {
     flex-grow: 1;
-    margin-right: 10px; 
+    margin-right: 10px;
+    word-break: break-word;
 }
-
 .checkbox-wrapper {
     position: relative;
     width: 30px;
@@ -464,57 +602,6 @@ body.dark-mode .task-item.completed .task-name {
     font-weight: normal;
 }
 
-.modal-overlay {
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); 
-    display: flex; 
-    justify-content: center; 
-    align-items: center;    
-
-}
-
-.contact-modal {
-    width: 350px;
-    height: 450px;
-    background-color: #D9D9D9;
-    border-radius: 20px; 
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); 
-    overflow: hidden; 
-    display: flex;
-    flex-direction: column;
-    border: 4px solid #4E87A3
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 23px 20px;
-    border-bottom: 1px solid #b1b1b1; 
-}
-
-.contact-title {
-    color: #333;
-    font-size: 1.7rem;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-}
-
-.close-button {
-    font-size: 41px; 
-    color: #666;
-    cursor: pointer;
-}
-
-.modal-content {
-    padding: 20px;
-}
-
 .social-link {
     display: flex;
     align-items: center;
@@ -562,6 +649,130 @@ body.dark-mode .task-item.completed .task-name {
     font-weight: 600;
 }
 
+body.dark-mode .social-link {
+    background-color: #505050;
+    color: #e0e0e0;
+}
+
+body.dark-mode .social-link:hover {
+    background-color: #666;
+}
+
+body.dark-mode .social-name {
+    color: #e0e0e0;
+}
+
+body.dark-mode .fa-instagram { color: #ff8787; }
+body.dark-mode .fa-facebook { color: #7dc1e0; }
+body.dark-mode .fa-telegram-plane { color: #84e6ff; }
+body.dark-mode .fa-phone { color: #d7f0c6; }
+
+
+/* Contacts Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.contact-modal {
+    width: 350px;
+    height: 450px;
+    background-color: #D9D9D9;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 4px solid #4E87A3;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 23px 20px;
+    border-bottom: 1px solid #b1b1b1;
+}
+
+.contact-title {
+    color: #333;
+    font-size: 1.7rem;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.close-button {
+    font-size: 41px;
+    color: #666;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.close-button:hover {
+    color: #333;
+}
+
+.modal-content {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    padding: 20px 15px;
+    margin-bottom: 10px;
+    background-color: #f8f9fab0;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.link-for-social{
+    text-decoration: none;
+    color: inherit;
+}
+
+.social-link:hover {
+    background-color: #ffffff;
+}
+
+.social-icon {
+    font-size: 30px;
+    margin-right: 15px;
+    min-width: 10px;
+}
+
+.fa-instagram { color: #E4405F; }
+.fa-facebook { color: #1877F2; }
+.fa-telegram-plane { color: #0088CC; }
+.fa-phone {color: #000000;}
+
+.social-name {
+    font-size: 1.5rem;
+    color: #141414;
+}
+
+.action-button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
 /* Contact Modal Dark Mode Styles */
 body.dark-mode .modal-overlay {
     background-color: rgba(0, 0, 0, 0.7);
@@ -583,6 +794,10 @@ body.dark-mode .contact-title {
 
 body.dark-mode .close-button {
     color: #b1b1b1;
+}
+
+body.dark-mode .close-button:hover {
+    color: #e0e0e0;
 }
 
 body.dark-mode .social-link {
